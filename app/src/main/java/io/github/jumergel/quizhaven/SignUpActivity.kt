@@ -19,20 +19,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jumergel.quizhaven.ui.theme.*
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 
 
-class HomeActivity : ComponentActivity() {
+class SignUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { QuizHavenTheme { HomeScreen() } }
+        setContent { QuizHavenTheme { SignUpScreen() } }
     }
 }
 
 @Composable
-fun HomeScreen() {
+fun SignUpScreen() {
     Box(Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.plant_home),
@@ -56,7 +53,7 @@ fun HomeScreen() {
             )
             Spacer(Modifier.height(150.dp))
             Text(
-                text = "Welcome to \nQuiz Haven",
+                text = "Sign In",
                 color = Cedar,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
@@ -64,19 +61,12 @@ fun HomeScreen() {
             )
             Spacer(Modifier.height(50.dp))
             val buttonMod = Modifier
-                .fillMaxWidth(0.6f)
-                .height(65.dp)
+                .fillMaxWidth(0.7f)
+                .height(50.dp)
 
 
-
-            EnterButton(
-                text = "Login",
-                onClick = { },
-                modifier = buttonMod
-            )
-            Spacer(Modifier.height(40.dp))
-            EnterButton(
-                text = "Sign Up",
+            DoneButton(
+                text = "Sign In",
                 onClick = { },
                 modifier = buttonMod
             )
@@ -90,29 +80,29 @@ fun HomeScreen() {
     }
 }
 
-@Composable
-fun EnterButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier,
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Tan,
-            contentColor = Ivory
-        ),
-        border = BorderStroke(1.dp, Ivory),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-    ) {
-        Text(text, fontSize = 20.sp)
-    }
-}
+//@Composable
+//fun DoneButton(
+//    text: String,
+//    onClick: () -> Unit,
+//    modifier: Modifier,
+//) {
+//    Button(
+//        onClick = onClick,
+//        modifier = modifier,
+//        shape = RoundedCornerShape(40.dp),
+//        colors = ButtonDefaults.buttonColors(
+//            containerColor = SoftGreen,
+//            contentColor = Ivory
+//        ),
+//        border = BorderStroke(1.dp, Ivory),
+//        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+//    ) {
+//        Text(text, fontSize = 20.sp)
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewHome() {
-    QuizHavenTheme { HomeScreen() }
+fun PreviewSignUpScreen() {
+    QuizHavenTheme { SignUpScreen() }
 }
