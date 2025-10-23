@@ -36,31 +36,31 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 
 
-class LoginActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent { QuizHavenTheme {
-            Box(Modifier.fillMaxSize()) {
-                Image(
-                    painter = painterResource(R.drawable.plant_home),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                // Foreground UI (transparent so bg is visible)
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onBackground
-                ) { innerPadding ->
-                    LoginScreen(paddingValues = innerPadding)
-                }
-            }
-        } }
-    }
-}
+//class LoginActivity : ComponentActivity() {
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        enableEdgeToEdge()
+//        setContent { QuizHavenTheme {
+//            Box(Modifier.fillMaxSize()) {
+//                Image(
+//                    painter = painterResource(R.drawable.plant_home),
+//                    contentDescription = null,
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier.fillMaxSize()
+//                )
+//
+//                // Foreground UI (transparent so bg is visible)
+//                Scaffold(
+//                    modifier = Modifier.fillMaxSize(),
+//                    containerColor = Color.Transparent,
+//                    contentColor = MaterialTheme.colorScheme.onBackground
+//                ) { innerPadding ->
+//                    LoginScreen(paddingValues = innerPadding)
+//                }
+//            }
+//        } }
+//    }
+//}
 
 @Composable
 fun LoginScreen(paddingValues: PaddingValues) {
@@ -71,7 +71,7 @@ fun LoginScreen(paddingValues: PaddingValues) {
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
 
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues),
@@ -179,82 +179,29 @@ fun LoginScreen(paddingValues: PaddingValues) {
                 ) {
                     Text("Login", fontSize = 18.sp, fontWeight = FontWeight.Medium)
                 }
+                Text(
+                    text = "Forget Password?",
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable { //handle forgot password logic
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(50.dp))
+
+                Row {
+                    Text(text = "Not a member? ")
+
+                    Text(
+                        text = "Sign up now!",
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable { //handle sign logic
+                        }
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-
-//        Text(
-//            text = "Forget Password?",
-//            color = MaterialTheme.colorScheme.primary,
-//            modifier = Modifier.clickable { //handle forgot password logic
-//            }
-//        )
-//
-//        Spacer(modifier = Modifier.height(50.dp))
-//
-//        Row {
-//            Text(text = "Not a member? ")
-//
-//            Text(
-//                text = "Sign in now!",
-//                color = MaterialTheme.colorScheme.primary,
-//                modifier = Modifier.clickable { //handle sign logic
-//                }
-//            )
-       // }
     }
-
-
-
-
-//    Box(Modifier.fillMaxSize()) {
-//        Image(
-//            painter = painterResource(R.drawable.plant_home),
-//            contentDescription = null,
-//            contentScale = ContentScale.Crop,
-//            modifier = Modifier.fillMaxSize()
-//        )
-//
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(horizontal = 24.dp)
-//                .padding(top = 80.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center
-//        ) {
-//            Text (
-//                text = "<logo>",
-//                fontSize = 25.sp,
-//                color = Color.White
-//            )
-//            Spacer(Modifier.height(150.dp))
-//            Text(
-//                text = "Login",
-//                color = Cedar,
-//                textAlign = TextAlign.Center,
-//                modifier = Modifier.fillMaxWidth(),
-//                style = Typography.displayLarge
-//            )
-//            Spacer(Modifier.height(50.dp))
-//            val buttonMod = Modifier
-//                .fillMaxWidth(0.7f)
-//                .height(50.dp)
-//
-//
-//            DoneButton(
-//                text = "Login",
-//                onClick = { },
-//                modifier = buttonMod
-//            )
-//            Spacer(Modifier.height(230.dp))
-//            Text (
-//                text = "Enjoy stress-free studying",
-//                fontSize = 20.sp,
-//                color = Ivory
-//            )
-//        }
-//    }
 }
 
 @Composable
