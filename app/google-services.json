@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "166097848811",
+    "project_id": "quizhaven-7",
+    "storage_bucket": "quizhaven-7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:166097848811:android:6e70db3c21958d380cb1ae",
+        "android_client_info": {
+          "package_name": "io.github.jumergel.quizhaven"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnTXLHsyJHZCFmG4OGKtxgu0qSsPSTjvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

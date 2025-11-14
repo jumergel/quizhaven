@@ -5,8 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -16,7 +18,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.jumergel.quizhaven.ui.theme.QuizHavenTheme
 
+
+
 class MainActivity : ComponentActivity(){
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,6 +33,7 @@ class MainActivity : ComponentActivity(){
                 NavHost(
                     navController = navController,
                     startDestination = "home"
+//                    startDestination = "home"
                 ) {
                     composable("home") {
                         HomeScreen(navController)   // pass controller here
@@ -39,15 +45,26 @@ class MainActivity : ComponentActivity(){
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
-                        LoginScreen(paddingValues = androidx.compose.foundation.layout.PaddingValues(0.dp))
+                        LoginScreen(navController, paddingValues = androidx.compose.foundation.layout.PaddingValues(0.dp))
                     }
-                }
+                    composable("signup") {
+                        Image(
+                            painter = painterResource(R.drawable.plant_home),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        SignUpScreen(navController)
+                    }
+                    composable("input") {
+                        TextInput(navController)   // pass controller here
+                    }
+                    composable("teaching") {
+                        TeachingScreen(navController)
+                    }
 
-////                LoginScreen(paddingValues = PaddingValues(0.dp))
-//                HomeScreen()
+                }
             }
         }
     }
-
-
 }

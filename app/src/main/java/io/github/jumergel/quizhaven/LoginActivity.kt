@@ -1,11 +1,6 @@
 package io.github.jumergel.quizhaven
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,48 +22,29 @@ import androidx.compose.ui.unit.sp
 import io.github.jumergel.quizhaven.ui.theme.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.compose.ui.graphics.Color.Companion.Unspecified
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
-
-//class LoginActivity : ComponentActivity() {
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
-//        setContent { QuizHavenTheme {
-//            Box(Modifier.fillMaxSize()) {
-//                Image(
-//                    painter = painterResource(R.drawable.plant_home),
-//                    contentDescription = null,
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier.fillMaxSize()
-//                )
-//
-//                // Foreground UI (transparent so bg is visible)
-//                Scaffold(
-//                    modifier = Modifier.fillMaxSize(),
-//                    containerColor = Color.Transparent,
-//                    contentColor = MaterialTheme.colorScheme.onBackground
-//                ) { innerPadding ->
-//                    LoginScreen(paddingValues = innerPadding)
-//                }
-//            }
-//        } }
-//    }
-//}
 
 @Composable
-fun LoginScreen(paddingValues: PaddingValues) {
+fun LoginScreen(navController: NavController, paddingValues: PaddingValues) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
+
+    //for login
+    val context = LocalContext.current
+    val auth = remember { FirebaseAuth.getInstance() }
+    var isBusy by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier
@@ -78,7 +53,7 @@ fun LoginScreen(paddingValues: PaddingValues) {
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
-        Spacer(modifier = Modifier.height(200.dp))
+        Spacer(modifier = Modifier.height(230.dp))
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -90,7 +65,7 @@ fun LoginScreen(paddingValues: PaddingValues) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(35.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
@@ -164,10 +139,27 @@ fun LoginScreen(paddingValues: PaddingValues) {
                     onClick = {
                         emailError = if (email.isBlank()) "Email is required" else ""
                         passwordError = if (password.isBlank()) "Password is required" else ""
-                        if (emailError.isEmpty() && passwordError.isEmpty()) {
-                            // TODO handle login
-                        }
+                        if (emailError.isNotEmpty() || passwordError.isNotEmpty()) return@Button
+
+                        isBusy = true
+
+
+                        auth.signInWithEmailAndPassword(email.trim(), password)
+                            .addOnCompleteListener { task ->
+                                isBusy = false
+                                if (task.isSuccessful) {
+                                    Toast.makeText(context, "Logged in!", Toast.LENGTH_SHORT).show()
+                                    // go to your home screen route
+                                    navController.navigate("input") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                } else {
+                                    val msg = task.exception?.localizedMessage ?: "Login failed"
+                                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                                }
+                            }
                     },
+                    enabled = !isBusy,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
@@ -177,12 +169,22 @@ fun LoginScreen(paddingValues: PaddingValues) {
                         contentColor = Ivory
                     )
                 ) {
-                    Text("Login", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                    Text(if (isBusy) "Signing in..." else "Login", fontSize = 18.sp, fontWeight = FontWeight.Medium)
                 }
+
+
+
+
                 Text(
                     text = "Forget Password?",
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable { //handle forgot password logic
+                        if (email.isNotBlank()) {
+                            auth.sendPasswordResetEmail(email.trim())
+                            Toast.makeText(context, "Password reset email sent (if account exists)", Toast.LENGTH_LONG).show()
+                        } else {
+                            emailError = "Enter email to reset"
+                        }
                     }
                 )
 
@@ -194,7 +196,8 @@ fun LoginScreen(paddingValues: PaddingValues) {
                     Text(
                         text = "Sign up now!",
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable { //handle sign logic
+                        modifier = Modifier.clickable {
+                            navController.navigate("signup")
                         }
                     )
                 }
@@ -224,9 +227,11 @@ fun DoneButton(
         Text(text, fontSize = 20.sp)
     }
 }
-
+//
 //@Preview(showBackground = true)
 //@Composable
 //fun PreviewLoginScreen() {
-//    QuizHavenTheme { LoginScreen() }
+//    QuizHavenTheme {
+//        LoginScreen(navController = navController,PaddingValues())
+//    }
 //}

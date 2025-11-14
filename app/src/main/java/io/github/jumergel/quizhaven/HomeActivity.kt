@@ -82,7 +82,7 @@ fun HomeScreen(navController: NavController) {
             Spacer(Modifier.height(40.dp))
             EnterButton(
                 text = "Sign Up",
-                onClick = { },
+                onClick = {navController.navigate("signup") },
                 modifier = buttonMod
             )
             Spacer(Modifier.height(230.dp))
