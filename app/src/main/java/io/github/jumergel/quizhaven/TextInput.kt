@@ -95,7 +95,7 @@ fun TextInput(navController: NavController) {
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White.copy(alpha = 0.92f) // white box
                 ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -130,9 +130,9 @@ fun TextInput(navController: NavController) {
             Spacer(Modifier.height(120.dp))
             Row (
                 modifier = Modifier
-                .fillMaxWidth(contentWidth)
-                .align(Alignment.CenterHorizontally)
-                .padding(horizontal = sidePad),
+                    .fillMaxWidth(contentWidth)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(horizontal = sidePad),
                 horizontalArrangement = Arrangement.SpaceBetween)
             {
                 EnterButton(
@@ -157,15 +157,16 @@ fun TextInput(navController: NavController) {
                         val data = mapOf(
                             "initialInput" to userText,
                             "messages" to emptyList<String>() ,
-                            "createdAt" to FieldValue.serverTimestamp()
+                            "createdAt" to FieldValue.serverTimestamp(),
+                            "keywords" to emptyList<String>()
                         )
                         db.collection("users")
                             .document(uid)
                             .collection("inputs")
                             .add(data)
-                            .addOnSuccessListener {
+                            .addOnSuccessListener { ref ->
                                 Toast.makeText(context, "Saved!", Toast.LENGTH_SHORT).show()
-                                navController.navigate("teaching")
+                                navController.navigate("teaching/${ref.id}")
                             }
                             .addOnFailureListener { e ->
                                 Toast.makeText(context, "Save failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()

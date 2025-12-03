@@ -6,9 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -59,8 +56,14 @@ class MainActivity : ComponentActivity(){
                     composable("input") {
                         TextInput(navController)   // pass controller here
                     }
-                    composable("teaching") {
-                        TeachingScreen(navController)
+                    composable("teaching/{inputId}") { backStackEntry ->
+                        val inputId = backStackEntry.arguments?.getString("inputId")!!
+                        TeachingScreen(navController, inputId)  // second screen
+                    }
+
+                    composable("quiz/{inputId}") { backStackEntry ->
+                        val inputId = backStackEntry.arguments?.getString("inputId")!!
+                        QuizScreen(navController, inputId)
                     }
 
                 }

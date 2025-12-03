@@ -32,14 +32,29 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.Firebase
+import com.google.firebase.functions.functions
+
 
 data class ChatMessage(
     val text: String,
     val isUser: Boolean = true // later you can add AI messages with false
 )
+
+private fun callAI(inputId: String, lastUserMsg: String, context: android.content.Context) {
+    Firebase.functions
+        .getHttpsCallable("replyToInput")
+        .call(mapOf("inputId" to inputId, "lastUserMsg" to lastUserMsg))
+        .addOnFailureListener { e ->
+            Toast.makeText(context, "AI failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+        }
+}
+
+
 
 @Composable
 fun ChatBubble(message: ChatMessage) {
@@ -64,25 +79,54 @@ fun ChatBubble(message: ChatMessage) {
         }
     }
 }
-
+val contentWidth = 1f  // screen content width
+val contentHeight = 1f  // screen content width
+val sidePad = 24.dp //extra padding on the side
 
 @Composable
-fun TeachingScreen(navController: NavController) {
+fun TeachingScreen(navController: NavController, inputId: String) {
+    val auth = FirebaseAuth.getInstance()
+    val db   = FirebaseFirestore.getInstance()
+    val context = LocalContext.current
+
+    val uid = auth.currentUser?.uid
+    if (uid == null) {
+        Toast.makeText(context, "Sign in error", Toast.LENGTH_SHORT).show()
+        navController.navigate("login")
+        return
+    }
+
+// reference to this input document
+    val inputRef = db.collection("users").document(uid)
+        .collection("inputs").document(inputId)
     var userText by rememberSaveable { mutableStateOf("") } //saved text
-    val contentWidth = 1f  // screen content width
-    val contentHeight = 1f  // screen content width
-    val sidePad = 24.dp //extra padding on the side
+
 
     // List of chat messages (cells)
     val messages = remember { mutableStateListOf<ChatMessage>() }
 
+    LaunchedEffect(inputId) {
+        inputRef.addSnapshotListener { snap, err ->
+            if (err != null || snap == null || !snap.exists()) return@addSnapshotListener
+            val arr = snap.get("messages") as? List<*> ?: emptyList<Any>()
+            messages.clear()
+            messages.addAll(arr.mapNotNull { it as? String }.map { ChatMessage(text = it, isUser = true) })
+        }
+    }
+
     fun sendMessage() {
         val trimmed = userText.trim()
-        if (trimmed.isNotEmpty()) {
-            messages.add(ChatMessage(text = trimmed, isUser = true))
-            userText = ""
-            // later you can trigger AI response here and add another ChatMessage with isUser = false
-        }
+        if (trimmed.isEmpty()) return
+        userText = ""
+
+        inputRef.update("messages", FieldValue.arrayUnion(trimmed))
+            .addOnSuccessListener {
+                // after user message is stored, ask the AI to reply
+               callAI(inputId = inputId, lastUserMsg = trimmed, context = context)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Send failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -114,19 +158,25 @@ fun TeachingScreen(navController: NavController) {
                         .padding(vertical = sidePad),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Card(){
+
                         Column(){
-                            Spacer(Modifier.height(16.dp))
-                            Text( //Title
-                                text = "Teaching Screen",
-                                color = Cedar,
-                                textAlign = TextAlign.Center,
-                                style = Typography.displayLarge,
-                                modifier = Modifier.padding(start = 12.dp)
+//                            Spacer(Modifier.height(16.dp))
+//                            Text( //Title
+//                                text = "Teaching Screen",
+//                                color = Cedar,
+//                                textAlign = TextAlign.Center,
+//                                style = Typography.displayLarge,
+//                                modifier = Modifier.padding(start = 12.dp)
+//                            )
+                            LearnTestNavBar(
+                                selectedTab = TopTab.Learn,
+                                onLearnClick = { /* already here */ },
+                                onTestClick = {
+                                    navController.navigate("quiz/$inputId")
+                                }
                             )
 
                             Spacer(Modifier.height(16.dp))
-                            HorizontalDivider()
 
                             //CHAT List
                             LazyColumn(
@@ -166,9 +216,10 @@ fun TeachingScreen(navController: NavController) {
                                 }
                             }
                         }
-                    }
+
                 }
             }
         }
     }
 }
+
