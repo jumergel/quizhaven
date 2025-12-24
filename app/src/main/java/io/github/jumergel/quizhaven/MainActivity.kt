@@ -56,6 +56,11 @@ class MainActivity : ComponentActivity(){
                     composable("input") {
                         TextInput(navController)   // pass controller here
                     }
+                    composable("survey/{inputId}") { backStackEntry ->
+                        val inputId = backStackEntry.arguments?.getString("inputId") ?: return@composable
+                        Survey(navController, inputId)
+                    }
+
                     composable("teaching/{inputId}") { backStackEntry ->
                         val inputId = backStackEntry.arguments?.getString("inputId")!!
                         TeachingScreen(navController, inputId)  // second screen

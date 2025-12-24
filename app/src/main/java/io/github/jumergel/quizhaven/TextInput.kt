@@ -166,7 +166,7 @@ fun TextInput(navController: NavController) {
                             .add(data)
                             .addOnSuccessListener { ref ->
                                 Toast.makeText(context, "Saved!", Toast.LENGTH_SHORT).show()
-                                navController.navigate("teaching/${ref.id}")
+                                navController.navigate("survey/${ref.id}")
                             }
                             .addOnFailureListener { e ->
                                 Toast.makeText(context, "Save failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
