@@ -45,11 +45,11 @@ val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = Newsreader,
         fontWeight = FontWeight.Normal,
-        fontSize = 18.sp
+        fontSize = 17.sp
     ),
     labelLarge = TextStyle(
         fontFamily = Newsreader,
         fontWeight = FontWeight.Medium,
-        fontSize = 16.sp
+        fontSize = 15.sp
     )
 )

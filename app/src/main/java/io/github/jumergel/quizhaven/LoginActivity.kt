@@ -29,7 +29,7 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
-
+import io.github.jumergel.quizhaven.ui.Layout
 
 @Composable
 fun LoginScreen(navController: NavController, paddingValues: PaddingValues) {
@@ -45,7 +45,6 @@ fun LoginScreen(navController: NavController, paddingValues: PaddingValues) {
     val auth = remember { FirebaseAuth.getInstance() }
     var isBusy by remember { mutableStateOf(false) }
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,9 +52,11 @@ fun LoginScreen(navController: NavController, paddingValues: PaddingValues) {
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
-        Spacer(modifier = Modifier.height(230.dp))
+        Spacer(modifier = Modifier.height(210.dp))
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Layout.sidePad),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White.copy(alpha = 0.92f) // white box
@@ -77,72 +78,71 @@ fun LoginScreen(navController: NavController, paddingValues: PaddingValues) {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // EMAIL
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = {
-                        Text(
-                            if (emailError.isEmpty()) "Email" else emailError,
-                            color = if (emailError.isEmpty()) Color.Unspecified else Color.Red
-                        )
-                    },
-                    leadingIcon = { Icon(Icons.Rounded.AccountCircle, null) },
-                    shape = RoundedCornerShape(10.dp),
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    // Transparent container so the card's white shows through
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                    verticalArrangement = Arrangement.spacedBy(6.dp) // 👈 tight spacing ONLY for these two
+                ) {
+                    // EMAIL
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = {
+                            Text(
+                                if (emailError.isEmpty()) "Email" else emailError,
+                                color = if (emailError.isEmpty()) Color.Unspecified else Color.Red
+                            )
+                        },
+                        leadingIcon = { Icon(Icons.Rounded.AccountCircle, null) },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SoftGreen,
+                            unfocusedBorderColor = SoftGreen.copy(alpha = 0.6f),
+                            errorBorderColor = Color.Red,
+                            focusedLabelColor = SoftGreen,
+                            cursorColor = SoftGreen
+                        )
                     )
-                )
 
-                // PASSWORD
-                TextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = {
-                        Text(
-                            if (passwordError.isEmpty()) "Password" else passwordError,
-                            color = if (passwordError.isEmpty()) Color.Unspecified else Color.Red
+                    // PASSWORD
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = {
+                            Text(
+                                if (passwordError.isEmpty()) "Password" else passwordError,
+                                color = if (passwordError.isEmpty()) Color.Unspecified else Color.Red
+                            )
+                        },
+                        leadingIcon = { Icon(Icons.Rounded.Lock, null) },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            val icon = if (passwordVisible) R.drawable.visibility else R.drawable.visibilityoff
+                            Icon(
+                                painter = painterResource(icon),
+                                contentDescription = null,
+                                modifier = Modifier.clickable { passwordVisible = !passwordVisible }
+                            )
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SoftGreen,
+                            unfocusedBorderColor = SoftGreen.copy(alpha = 0.6f),
+                            errorBorderColor = Color.Red,
+                            focusedLabelColor = SoftGreen,
+                            cursorColor = SoftGreen
                         )
-                    },
-                    leadingIcon = { Icon(Icons.Rounded.Lock, null) },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None
-                    else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        val icon = if (passwordVisible) R.drawable.visibility
-                        else R.drawable.visibilityoff
-                        Icon(
-                            painter = painterResource(icon),
-                            contentDescription = null,
-                            modifier = Modifier.clickable { passwordVisible = !passwordVisible }
-                        )
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
                     )
-                )
+                }
+
 
                 Button(
                     onClick = {
                         emailError = if (email.isBlank()) "Email is required" else ""
                         passwordError = if (password.isBlank()) "Password is required" else ""
                         if (emailError.isNotEmpty() || passwordError.isNotEmpty()) return@Button
-
                         isBusy = true
-
 
                         auth.signInWithEmailAndPassword(email.trim(), password)
                             .addOnCompleteListener { task ->
@@ -150,7 +150,7 @@ fun LoginScreen(navController: NavController, paddingValues: PaddingValues) {
                                 if (task.isSuccessful) {
                                     Toast.makeText(context, "Logged in!", Toast.LENGTH_SHORT).show()
                                     // go to your home screen route
-                                    navController.navigate("input") {
+                                    navController.navigate("projects") {
                                         popUpTo("login") { inclusive = true }
                                     }
                                 } else {
@@ -172,9 +172,6 @@ fun LoginScreen(navController: NavController, paddingValues: PaddingValues) {
                     Text(if (isBusy) "Signing in..." else "Login", fontSize = 18.sp, fontWeight = FontWeight.Medium)
                 }
 
-
-
-
                 Text(
                     text = "Forget Password?",
                     color = MaterialTheme.colorScheme.primary,
@@ -188,7 +185,7 @@ fun LoginScreen(navController: NavController, paddingValues: PaddingValues) {
                     }
                 )
 
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row {
                     Text(text = "Not a member? ")
@@ -227,11 +224,4 @@ fun DoneButton(
         Text(text, fontSize = 20.sp)
     }
 }
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewLoginScreen() {
-//    QuizHavenTheme {
-//        LoginScreen(navController = navController,PaddingValues())
-//    }
-//}
+

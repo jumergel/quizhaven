@@ -2,6 +2,7 @@ package io.github.jumergel.quizhaven
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
+import io.github.jumergel.quizhaven.ui.Layout
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -26,7 +27,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun Survey(navController: NavController, inputId: String) {
+fun Survey(navController: NavController, projectId: String, inputId: String)
+{
     // firebase
     val context = LocalContext.current
     val auth = remember { FirebaseAuth.getInstance() }
@@ -54,12 +56,7 @@ fun Survey(navController: NavController, inputId: String) {
         }
     }
     val isSurveyComplete = selectedAge != null && selectedGoal != null && selectedTypes.isNotEmpty()
-
     val scrollState = rememberScrollState()
-
-    // Layout sizing (wider survey + button, consistent widths)
-    val contentWidth = 0.92f
-    val sidePad = 16.dp
 
     Box(Modifier.fillMaxSize()) {
         // Background
@@ -88,8 +85,8 @@ fun Survey(navController: NavController, inputId: String) {
             // Survey card
             Card(
                 modifier = Modifier
-                    .fillMaxWidth(contentWidth)
-                    .padding(horizontal = sidePad)
+                    .fillMaxWidth(Layout.contentWidth)
+                    .padding(horizontal = Layout.sidePad)
                     .weight(1f),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
@@ -117,7 +114,6 @@ fun Survey(navController: NavController, inputId: String) {
                     SectionTitle("Your goals")
                     RadioRow("Introduce a topic", selectedGoal == "introduce a topic") { selectedGoal = "introduce a topic" }
                     RadioRow("Study", selectedGoal == "study") { selectedGoal = "study" }
-                    RadioRow("Learn terminology", selectedGoal == "learn terminology") { selectedGoal = "learn terminology" }
                     RadioRow("Test me", selectedGoal == "test me") { selectedGoal = "test me" }
 
                     Divider()
@@ -139,8 +135,8 @@ fun Survey(navController: NavController, inputId: String) {
 
             // Save button (same width as card)
             val buttonMod = Modifier
-                .fillMaxWidth(contentWidth)
-                .padding(horizontal = sidePad)
+                .fillMaxWidth(Layout.contentWidth)
+                .padding(horizontal = Layout.sidePad)
                 .height(56.dp)
 
             EnterButton(
@@ -168,8 +164,8 @@ fun Survey(navController: NavController, inputId: String) {
 
                     db.collection("users")
                         .document(uid)
-                        .collection("inputs")
-                        .document(inputId)
+                        .collection("projects").document(projectId)
+                        .collection("inputs").document(inputId)
                         .update(
                             mapOf(
                                 "survey" to surveyData,
@@ -179,7 +175,7 @@ fun Survey(navController: NavController, inputId: String) {
                         .addOnSuccessListener {
                             Toast.makeText(context, "Survey saved!", Toast.LENGTH_SHORT).show()
                             // Navigate to teaching with SAME inputId
-                            navController.navigate("teaching/$inputId")
+                            navController.navigate("teaching/$projectId/$inputId")
                         }
                         .addOnFailureListener { e ->
                             Toast.makeText(context, "Save failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()

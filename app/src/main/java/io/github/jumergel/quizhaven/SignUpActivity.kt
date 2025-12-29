@@ -1,6 +1,5 @@
 package io.github.jumergel.quizhaven
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,13 +15,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -30,6 +27,7 @@ import io.github.jumergel.quizhaven.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import io.github.jumergel.quizhaven.ui.Layout
 
 @Composable
 fun SignUpScreen(navController: NavController) {
@@ -50,9 +48,11 @@ fun SignUpScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
-        Spacer(modifier = Modifier.height(230.dp))
+        Spacer(modifier = Modifier.height(210.dp))
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Layout.sidePad),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White.copy(alpha = 0.92f) // white box
@@ -74,63 +74,66 @@ fun SignUpScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // EMAIL
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = {
-                        Text(
-                            if (emailError.isEmpty()) "Email" else emailError,
-                            color = if (emailError.isEmpty()) Color.Unspecified else Color.Red
-                        )
-                    },
-                    leadingIcon = { Icon(Icons.Rounded.AccountCircle, null) },
-                    shape = RoundedCornerShape(10.dp),
+                // EMAIL + PASSWORD fields
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    // Transparent container so the card's white shows through
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                    verticalArrangement = Arrangement.spacedBy(6.dp) // adjust to 4.dp if you want tighter
+                ) {
+                    // EMAIL
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = {
+                            Text(
+                                if (emailError.isEmpty()) "Email" else emailError,
+                                color = if (emailError.isEmpty()) Color.Unspecified else Color.Red
+                            )
+                        },
+                        leadingIcon = { Icon(Icons.Rounded.AccountCircle, null) },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SoftGreen,
+                            unfocusedBorderColor = SoftGreen.copy(alpha = 0.6f),
+                            errorBorderColor = Color.Red,
+                            focusedLabelColor = SoftGreen,
+                            cursorColor = SoftGreen
+                        )
                     )
-                )
 
-                // PASSWORD
-                TextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = {
-                        Text(
-                            if (passwordError.isEmpty()) "Password" else passwordError,
-                            color = if (passwordError.isEmpty()) Color.Unspecified else Color.Red
+                    // PASSWORD
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = {
+                            Text(
+                                if (passwordError.isEmpty()) "Password" else passwordError,
+                                color = if (passwordError.isEmpty()) Color.Unspecified else Color.Red
+                            )
+                        },
+                        leadingIcon = { Icon(Icons.Rounded.Lock, null) },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            val icon = if (passwordVisible) R.drawable.visibility
+                            else R.drawable.visibilityoff
+                            Icon(
+                                painter = painterResource(icon),
+                                contentDescription = null,
+                                modifier = Modifier.clickable { passwordVisible = !passwordVisible }
+                            )
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SoftGreen,
+                            unfocusedBorderColor = SoftGreen.copy(alpha = 0.6f),
+                            errorBorderColor = Color.Red,
+                            focusedLabelColor = SoftGreen,
+                            cursorColor = SoftGreen
                         )
-                    },
-                    leadingIcon = { Icon(Icons.Rounded.Lock, null) },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None
-                    else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        val icon = if (passwordVisible) R.drawable.visibility
-                        else R.drawable.visibilityoff
-                        Icon(
-                            painter = painterResource(icon),
-                            contentDescription = null,
-                            modifier = Modifier.clickable { passwordVisible = !passwordVisible }
-                        )
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
                     )
-                )
+                }
 
                 Button(
                     onClick = {
@@ -171,33 +174,34 @@ fun SignUpScreen(navController: NavController) {
                         contentColor = Ivory
                     )
                 ) {
-                    Text(if (isBusy) "Creating..." else "Sign Up")
-//                    Text("Sign Up", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                    Text(
+                        text = if (isBusy) "Creating..." else "Sign Up",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
 
-
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
                 Row {
-                    Text(text = "Already a member? ")
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "Already a member? ")
 
-                    Text(
-                        text = "Sign in here!",
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable {
-                            navController.navigate("login")
-                        }
-                    )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Sign in here!",
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable {
+                                navController.navigate("login")
+                            }
+                        )
+                    }
                 }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewSignUpScreen() {
-//    QuizHavenTheme { SignUpScreen() }
-//}

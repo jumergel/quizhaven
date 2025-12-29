@@ -1,10 +1,7 @@
 package io.github.jumergel.quizhaven
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import io.github.jumergel.quizhaven.ui.Layout
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -15,11 +12,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jumergel.quizhaven.ui.theme.*
-import android.content.Intent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,28 +28,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
-
-
-
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.remember
 
 @Composable
-fun TextInput(navController: NavController) {
+fun TextInput(navController: NavController, projectId: String) {
     var userText by rememberSaveable { mutableStateOf("") } //saved text
-    val contentWidth = 0.8f  // screen content width
-    val sidePad = 24.dp //extra padding on the side
 
     //firebase
     val context = LocalContext.current
     val auth = remember { FirebaseAuth.getInstance() }
     val db   = remember { FirebaseFirestore.getInstance() }
-//    val context = LocalContext.current
-//    val auth = rememberSaveable { FirebaseAuth.getInstance() }
-//    val db = rememberSaveable { FirebaseFirestore.getInstance() }
 
     Box(Modifier.fillMaxSize()) {
         Image(
@@ -91,6 +74,9 @@ fun TextInput(navController: NavController) {
 
             //text input
             Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Layout.sidePad),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White.copy(alpha = 0.92f) // white box
@@ -99,7 +85,7 @@ fun TextInput(navController: NavController) {
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth(contentWidth)
+                        .fillMaxWidth(Layout.contentWidth)
                         .fillMaxHeight(0.5f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
@@ -130,9 +116,9 @@ fun TextInput(navController: NavController) {
             Spacer(Modifier.height(120.dp))
             Row (
                 modifier = Modifier
-                    .fillMaxWidth(contentWidth)
+                    .fillMaxWidth(Layout.contentWidth)
                     .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = sidePad),
+                    .padding(horizontal = Layout.sidePad),
                 horizontalArrangement = Arrangement.SpaceBetween)
             {
                 EnterButton(
@@ -162,11 +148,13 @@ fun TextInput(navController: NavController) {
                         )
                         db.collection("users")
                             .document(uid)
+                            .collection("projects").document(projectId)
                             .collection("inputs")
                             .add(data)
                             .addOnSuccessListener { ref ->
                                 Toast.makeText(context, "Saved!", Toast.LENGTH_SHORT).show()
-                                navController.navigate("survey/${ref.id}")
+                                navController.navigate("survey/$projectId/${ref.id}")
+
                             }
                             .addOnFailureListener { e ->
                                 Toast.makeText(context, "Save failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()

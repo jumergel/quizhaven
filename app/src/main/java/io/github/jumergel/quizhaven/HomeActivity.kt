@@ -27,7 +27,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-
 class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,25 +66,23 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 style = Typography.displayLarge
             )
-            Spacer(Modifier.height(50.dp))
+            Spacer(Modifier.height(40.dp))
             val buttonMod = Modifier
                 .fillMaxWidth(0.6f)
                 .height(65.dp)
-
-
 
             EnterButton(
                 text = "Login",
                 onClick = {navController.navigate("login")},
                 modifier = buttonMod
             )
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(35.dp))
             EnterButton(
                 text = "Sign Up",
                 onClick = {navController.navigate("signup") },
                 modifier = buttonMod
             )
-            Spacer(Modifier.height(230.dp))
+            Spacer(Modifier.height(150.dp))
             Text (
                 text = "Enjoy stress-free studying",
                 fontSize = 20.sp,
@@ -115,9 +112,3 @@ fun EnterButton(
         Text(text, fontSize = 20.sp)
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewHome() {
-//    QuizHavenTheme { HomeScreen() }
-//}
